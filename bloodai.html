@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BloodAI — AI-Enhanced Smart Blood Management System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #c0392b;
+  --dark-red: #96281b;
+  --deep-red: #7b1818;
+  --light-red: #fdecea;
+  --mid-red: #e74c3c;
+  --bg: #f5f3f0;
+  --card-bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --border: #e8e3dc;
+  --sidebar-w: 240px;
+  --navbar-h: 60px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── PAGES ─────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── NAVBAR ─────────────────────────────── */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--navbar-h);
+  background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 100;
+}
+.brand { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--red); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.brand i { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.nav-user { display: flex; align-items: center; gap: 12px; font-size: 0.88rem; }
+.nav-user .badge-role {
+  background: var(--light-red); color: var(--red);
+  padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: .75rem;
+}
+#navbar-user-area { display: none; }
+
+/* ── SIDEBAR ─────────────────────────────── */
+#sidebar {
+  position: fixed; left: 0; top: var(--navbar-h); bottom: 0;
+  width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--border);
+  padding: 20px 12px; z-index: 90; display: none; overflow-y: auto;
+}
+#sidebar.visible { display: block; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 10px; color: #4b5563; font-size: .88rem; font-weight: 500;
+  text-decoration: none; margin-bottom: 4px; transition: all .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--light-red); color: var(--red);
+}
+.sidebar-nav a i { width: 18px; text-align: center; font-size: .95rem; }
+.sidebar-section { font-size: .7rem; color: #9ca3af; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 16px 14px 6px; }
+
+/* ── MAIN CONTENT ─────────────────────────── */
+#main-content { padding-top: var(--navbar-h); min-height: 100vh; }
+#main-content.with-sidebar { margin-left: var(--sidebar-w); }
+.content-area { padding: 32px; }
+
+/* ── LANDING PAGE ─────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #c0392b 0%, #7b1818 100%);
+  min-height: 100vh; display: flex; align-items: center; padding: var(--navbar-h) 0 0;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -40%; right: -10%;
+  width: 700px; height: 700px; border-radius: 50%;
+  background: rgba(255,255,255,.03); pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -30%; left: -5%;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero h1 {
+  font-family: 'Sora', sans-serif; font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 20px;
+}
+.hero h1 span { color: #fdb; }
+.hero p { color: rgba(255,255,255,.85); font-size: 1.1rem; max-width: 520px; line-height: 1.7; margin-bottom: 32px; }
+.hero-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-hero-primary {
+  background: #fff; color: var(--red); border: none; padding: 14px 28px;
+  border-radius: 12px; font-weight: 700; font-size: .95rem; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+.btn-hero-outline {
+  background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.5);
+  padding: 12px 26px; border-radius: 12px; font-weight: 600; font-size: .95rem; cursor: pointer;
+  transition: all .15s;
+}
+.btn-hero-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); }
+
+.stats-row { display: flex; gap: 32px; margin-top: 48px; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hero-stat .num { font-family: 'Sora', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; }
+.hero-stat .lbl { color: rgba(255,255,255,.65); font-size: .8rem; margin-top: 2px; }
+
+.blood-groups-row {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 60px;
+}
+.bg-pill {
+  background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50px; padding: 8px 18px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: .95rem;
+  transition: all .2s;
+}
+.bg-pill:hover { background: rgba(255,255,255,.25); transform: scale(1.05); }
+
+/* ── FEATURE CARDS ─────────────────────────── */
+.features-section { background: #fff; padding: 80px 0; }
+.section-title { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+.section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; margin: 0 auto 48px; }
+.feature-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 18px;
+  padding: 32px; text-align: center; height: 100%; transition: all .2s;
+}
+.feature-card:hover { border-color: var(--red); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(192,57,43,.1); }
+.feature-icon { width: 64px; height: 64px; background: var(--light-red); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.feature-icon i { font-size: 1.7rem; color: var(--red); }
+.feature-card h5 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; }
+.feature-card p { color: var(--muted); font-size: .88rem; line-height: 1.65; }
+.accuracy-badge {
+  display: inline-block; background: var(--light-red); color: var(--red);
+  font-weight: 700; font-size: .8rem; padding: 4px 12px; border-radius: 20px; margin-top: 14px;
+}
+
+/* ── PORTALS ─────────────────────────────── */
+.portal-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 18px;
+  padding: 28px; text-align: center; cursor: pointer; transition: all .2s; height: 100%;
+}
+.portal-card:hover { border-color: var(--red); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(192,57,43,.1); }
+.portal-icon { font-size: 2.5rem; color: var(--red); margin-bottom: 16px; }
+.portal-card h5 { font-family: 'Sora', sans-serif; font-weight: 700; }
+.portal-card p { color: var(--muted); font-size: .85rem; margin-top: 8px; }
+.btn-portal {
+  display: inline-block; background: var(--red); color: #fff;
+  border: none; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: .88rem;
+  cursor: pointer; margin-top: 16px; transition: background .15s;
+}
+.btn-portal:hover { background: var(--dark-red); }
+
+/* ── AUTH PAGES ─────────────────────────── */
+.auth-wrapper {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 80px 20px 40px; background: var(--bg);
+}
+.auth-card {
+  background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.08); border: 1px solid var(--border);
+}
+.auth-logo { text-align: center; margin-bottom: 28px; }
+.auth-logo i { font-size: 2.8rem; color: var(--red); animation: pulse 2s ease-in-out infinite; }
+.auth-logo h4 { font-family: 'Sora', sans-serif; font-weight: 800; margin-top: 10px; font-size: 1.4rem; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: .83rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.form-control, .form-select {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: .9rem; font-family: 'DM Sans', sans-serif; background: #fff;
+  transition: border-color .15s; outline: none;
+}
+.form-control:focus, .form-select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
+.btn-auth {
+  width: 100%; padding: 13px; background: var(--red); color: #fff; border: none;
+  border-radius: 10px; font-weight: 700; font-size: .95rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: background .15s;
+}
+.btn-auth:hover { background: var(--dark-red); }
+.auth-switch { text-align: center; margin-top: 18px; font-size: .88rem; color: var(--muted); }
+.auth-switch a { color: var(--red); font-weight: 600; cursor: pointer; text-decoration: none; }
+
+/* ── ALERTS ─────────────────────────────── */
+.alert-msg {
+  padding: 12px 16px; border-radius: 10px; margin-bottom: 16px;
+  font-size: .88rem; font-weight: 500; display: none;
+}
+.alert-msg.show { display: block; }
+.alert-error { background: #fdecea; color: var(--red); border: 1px solid #f5c6c2; }
+.alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+
+/* ── DASHBOARD ─────────────────────────── */
+.dash-welcome { margin-bottom: 28px; }
+.dash-welcome h4 { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.6rem; }
+.dash-welcome p { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px; display: flex; flex-direction: column;
+  border-left: 4px solid var(--red);
+}
+.stat-card .s-label { font-size: .78rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.stat-card .s-value { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 800; margin-top: 4px; }
+.stat-card .s-icon { font-size: 1.4rem; margin-bottom: 8px; }
+.stat-card.green { border-left-color: #10b981; }
+.stat-card.blue { border-left-color: #3b82f6; }
+.stat-card.amber { border-left-color: #f59e0b; }
+
+/* ── DATA CARDS ─────────────────────────── */
+.data-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  margin-bottom: 20px;
+}
+.data-card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.data-card-header h6 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: .95rem; margin: 0; }
+.data-card-body { padding: 20px; }
+
+/* ── TABLE ─────────────────────────────── */
+.tbl { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.tbl th { background: #f9f8f6; padding: 12px 14px; text-align: left; font-weight: 600; font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); }
+.tbl td { padding: 13px 14px; border-bottom: 1px solid #f3f1ed; }
+.tbl tbody tr:hover { background: #fdfcfb; }
+
+/* ── BADGES ─────────────────────────────── */
+.badge-blood {
+  background: var(--red); color: #fff; padding: 4px 10px;
+  border-radius: 20px; font-size: .78rem; font-weight: 700; font-family: 'Sora', sans-serif;
+}
+.badge-status {
+  padding: 4px 10px; border-radius: 20px; font-size: .76rem; font-weight: 600;
+}
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-accepted { background: #d1fae5; color: #065f46; }
+.badge-declined { background: #f3f4f6; color: #6b7280; }
+.badge-progress { background: #dbeafe; color: #1e40af; }
+.badge-fulfilled { background: #d1fae5; color: #065f46; }
+.badge-critical { background: #fdecea; color: var(--red); font-weight: 700; }
+.badge-urgent { background: #fef3c7; color: #92400e; font-weight: 700; }
+.badge-normal { background: #ecfdf5; color: #065f46; }
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn-primary-sm {
+  background: var(--red); color: #fff; border: none; padding: 7px 16px;
+  border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.btn-primary-sm:hover { background: var(--dark-red); }
+.btn-outline-sm {
+  background: transparent; color: var(--red); border: 1.5px solid var(--red); padding: 6px 14px;
+  border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-outline-sm:hover { background: var(--red); color: #fff; }
+.btn-success-sm {
+  background: #10b981; color: #fff; border: none; padding: 7px 14px;
+  border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; transition: background .15s;
+}
+.btn-danger-sm {
+  background: transparent; color: #9ca3af; border: 1.5px solid #e5e7eb; padding: 6px 12px;
+  border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+
+/* ── NOTIFICATION CARD ─────────────────── */
+.notif-item {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 18px 20px;
+  margin-bottom: 14px; transition: border-color .2s;
+}
+.notif-item.urgent { border-left: 4px solid #f59e0b; }
+.notif-item.critical { border-left: 4px solid var(--red); }
+.notif-item.normal { border-left: 4px solid #10b981; }
+.notif-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.notif-title { font-weight: 700; font-size: .92rem; }
+.notif-time { font-size: .78rem; color: var(--muted); }
+.notif-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; font-size: .83rem; }
+.notif-meta span { color: var(--muted); }
+.notif-meta strong { color: var(--text); }
+.notif-actions { display: flex; gap: 10px; }
+
+/* ── AI PANEL ─────────────────────────── */
+.ai-panel {
+  background: linear-gradient(135deg, #fff5f5, #fff); border: 1.5px solid #fca5a5;
+  border-radius: 16px; padding: 20px; margin-bottom: 20px;
+}
+.ai-panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.ai-panel-header .ai-icon { background: var(--red); color: #fff; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
+.ai-panel-header h6 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: .95rem; margin: 0; }
+.donor-match {
+  background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px;
+}
+.donor-match .rank { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--red); width: 28px; }
+.donor-match .info { flex: 1; }
+.donor-match .info strong { display: block; font-size: .9rem; }
+.donor-match .info span { font-size: .8rem; color: var(--muted); }
+.match-score { text-align: right; }
+.match-score .pct { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1rem; color: #10b981; }
+.match-score .lbl { font-size: .7rem; color: var(--muted); display: block; }
+.match-bar { width: 100%; background: #f3f4f6; border-radius: 4px; height: 6px; margin-top: 6px; overflow: hidden; }
+.match-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width .8s ease; }
+
+/* ── REQUEST FORM ─────────────────────── */
+.req-form-card {
+  background: #fff; border: 2px solid var(--border); border-radius: 20px; padding: 32px; max-width: 640px; margin: 0 auto;
+}
+.req-form-card .form-title { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--red); margin-bottom: 24px; }
+.blood-group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+.bg-option { display: none; }
+.bg-option + label {
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--border); border-radius: 10px; padding: 12px;
+  cursor: pointer; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem;
+  transition: all .15s;
+}
+.bg-option:checked + label { border-color: var(--red); background: var(--light-red); color: var(--red); }
+.urgency-grid { display: flex; gap: 12px; margin-bottom: 20px; }
+.urgency-option { display: none; }
+.urgency-option + label {
+  flex: 1; text-align: center; border: 2px solid var(--border); border-radius: 10px;
+  padding: 12px 8px; cursor: pointer; font-weight: 600; font-size: .88rem; transition: all .15s;
+}
+.urgency-option.critical:checked + label { border-color: var(--red); background: var(--light-red); color: var(--red); }
+.urgency-option.urgent:checked + label { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+.urgency-option.normal:checked + label { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+.range-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #e5e7eb; outline: none; }
+.range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--red); cursor: pointer; }
+.units-display { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--red); text-align: center; }
+
+/* ── PROFILE FORM ─────────────────────── */
+.profile-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 28px; max-width: 680px; }
+.avatar-circle {
+  width: 72px; height: 72px; background: var(--light-red); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif;
+  font-weight: 800; font-size: 1.5rem; color: var(--red); margin-bottom: 20px;
+}
+.eligibility-bar { background: #e5e7eb; border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+.eligibility-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--red), #f59e0b); transition: width 1s ease; }
+
+/* ── CHART WRAPPERS ─────────────────────── */
+.chart-wrap { position: relative; width: 100%; height: 260px; }
+.chart-wrap-sm { position: relative; width: 100%; height: 180px; }
+
+/* ── ML MODEL CARDS ─────────────────────── */
+.ml-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.ml-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--red), #f59e0b);
+}
+.ml-metric { display: flex; justify-content: space-between; margin-top: 14px; }
+.ml-metric-item { text-align: center; }
+.ml-metric-item .val { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--red); }
+.ml-metric-item .lbl { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media (max-width: 768px) {
+  #sidebar { transform: translateX(-100%); transition: transform .25s; }
+  #sidebar.mobile-open { transform: translateX(0); display: block; }
+  #main-content.with-sidebar { margin-left: 0; }
+  .hero h1 { font-size: 1.8rem; }
+  .content-area { padding: 20px; }
+}
+
+/* ── TOAST ─────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff;
+  padding: 14px 20px; border-radius: 12px; font-size: .88rem; font-weight: 500;
+  z-index: 9999; transform: translateY(80px); opacity: 0;
+  transition: all .3s; max-width: 320px; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast i { margin-right: 8px; }
+
+/* ── STEP WIZARD ─────────────────────────── */
+.step-wizard { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+.step-item { display: flex; align-items: center; gap: 8px; }
+.step-num {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--border); color: var(--muted);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .8rem;
+  transition: all .3s;
+}
+.step-num.active { background: var(--red); color: #fff; }
+.step-num.done { background: #10b981; color: #fff; }
+.step-label { font-size: .8rem; font-weight: 600; color: var(--muted); }
+.step-label.active { color: var(--red); }
+.step-divider { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
+
+/* ── ANIMATIONS ─────────────────────────── */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeInUp .4s ease; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="brand" onclick="goHome()">
+    <i class="fas fa-heartbeat"></i>
+    BloodAI
+  </div>
+  <div id="navbar-user-area" class="nav-user">
+    <span id="nav-username" class="fw-semibold" style="font-size:.9rem;"></span>
+    <span id="nav-role-badge" class="badge-role"></span>
+    <button onclick="logout()" style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;">
+      <i class="fas fa-sign-out-alt me-1"></i>Logout
+    </button>
+  </div>
+  <div id="navbar-auth-area">
+    <button class="btn-outline-sm me-2" onclick="showPage('login')">Sign In</button>
+    <button class="btn-primary-sm" onclick="showPage('register')">Register</button>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="sidebar-donor" style="display:none;">
+    <div class="sidebar-section">Donor Portal</div>
+    <nav class="sidebar-nav">
+      <a href="#" onclick="showDashboard()" class="active" id="snav-dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+      <a href="#" onclick="showDonorProfile()"><i class="fas fa-user-edit"></i>My Profile</a>
+      <a href="#" onclick="showDonationHistory()"><i class="fas fa-history"></i>Donation History</a>
+      <a href="#" onclick="showDonorNotifications()"><i class="fas fa-bell"></i>Notifications <span id="pending-badge" class="badge-blood ms-auto" style="font-size:.7rem;display:none;">3</span></a>
+    </nav>
+  </div>
+  <div id="sidebar-hospital" style="display:none;">
+    <div class="sidebar-section">Hospital Portal</div>
+    <nav class="sidebar-nav">
+      <a href="#" onclick="showHospitalDashboard()"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+      <a href="#" onclick="showNewRequest()"><i class="fas fa-plus-circle"></i>New Request</a>
+      <a href="#" onclick="showAllRequests()"><i class="fas fa-list"></i>All Requests</a>
+      <a href="#" onclick="showHospitalProfile()"><i class="fas fa-building"></i>Profile</a>
+    </nav>
+  </div>
+  <div id="sidebar-admin" style="display:none;">
+    <div class="sidebar-section">Admin Control</div>
+    <nav class="sidebar-nav">
+      <a href="#" onclick="showAdminDashboard()"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+      <a href="#" onclick="showUsers()"><i class="fas fa-users"></i>Users</a>
+      <a href="#" onclick="showMLModels()"><i class="fas fa-brain"></i>ML Models</a>
+      <a href="#" onclick="showReports()"><i class="fas fa-chart-bar"></i>Reports</a>
+    </nav>
+  </div>
+  <div style="margin-top:auto;padding-top:20px;border-top:1px solid var(--border);margin-top:40px;">
+    <nav class="sidebar-nav">
+      <a href="#" onclick="logout()" style="color:#ef4444!important;"><i class="fas fa-sign-out-alt"></i>Logout</a>
+    </nav>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-content">
+
+  <!-- ═══════════ LANDING PAGE ═══════════ -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-7 hero-inner">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:6px 16px;border-radius:50px;margin-bottom:24px;">
+              <i class="fas fa-circle" style="font-size:.5rem;color:#fca5a5;"></i>
+              <span style="font-size:.82rem;color:rgba(255,255,255,.9);font-weight:600;">AI-Powered · Real-Time · Life-Saving</span>
+            </div>
+            <h1>AI-Enhanced Smart <span>Blood Management</span> System</h1>
+            <p>Emergency donor recommendation with KNN matching, Random Forest demand prediction, and Logistic Regression response scoring — all in real time.</p>
+            <div class="hero-btns">
+              <button class="btn-hero-primary" onclick="showPage('register')"><i class="fas fa-user-plus me-2"></i>Register as Donor</button>
+              <button class="btn-hero-outline" onclick="showPage('login')"><i class="fas fa-sign-in-alt me-2"></i>Sign In</button>
+            </div>
+            <div class="stats-row">
+              <div class="hero-stat"><div class="num">93.2%</div><div class="lbl">KNN Accuracy</div></div>
+              <div class="hero-stat"><div class="num">0.91</div><div class="lbl">RF R² Score</div></div>
+              <div class="hero-stat"><div class="num">89.6%</div><div class="lbl">LR Accuracy</div></div>
+              <div class="hero-stat"><div class="num">&lt;2min</div><div class="lbl">Response Time</div></div>
+            </div>
+          </div>
+          <div class="col-lg-5 d-none d-lg-block">
+            <div class="blood-groups-row justify-content-center">
+              <div class="bg-pill">A+</div><div class="bg-pill">A-</div>
+              <div class="bg-pill">B+</div><div class="bg-pill">B-</div>
+              <div class="bg-pill">O+</div><div class="bg-pill">O-</div>
+              <div class="bg-pill">AB+</div><div class="bg-pill">AB-</div>
+            </div>
+            <!-- Live mini-stats card -->
+            <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:20px;margin-top:24px;">
+              <div style="color:rgba(255,255,255,.7);font-size:.78rem;margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">System Live Stats</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="color:rgba(255,255,255,.8);font-size:.88rem;"><i class="fas fa-users me-2" style="font-size:.8rem;"></i>Active Donors</span>
+                  <span style="font-family:'Sora';font-weight:800;color:#fff;" id="live-donors">2,847</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="color:rgba(255,255,255,.8);font-size:.88rem;"><i class="fas fa-hospital me-2" style="font-size:.8rem;"></i>Hospitals</span>
+                  <span style="font-family:'Sora';font-weight:800;color:#fff;" id="live-hospitals">142</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="color:rgba(255,255,255,.8);font-size:.88rem;"><i class="fas fa-tint me-2" style="font-size:.8rem;"></i>Requests Today</span>
+                  <span style="font-family:'Sora';font-weight:800;color:#fdb;" id="live-requests">18</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">Three AI Engines, One Mission</h2>
+          <p class="section-sub text-muted">Our integrated ML pipeline activates the moment a blood emergency is submitted.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <h5>KNN Donor Matching</h5>
+              <p>K-Nearest Neighbors finds geographically closest, blood-compatible, and eligible donors using Haversine distance calculations in real time.</p>
+              <div class="accuracy-badge">93.2% Matching Accuracy</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+              <h5>Random Forest Forecasting</h5>
+              <p>Predicts blood demand 7–30 days ahead per hospital and district. Learns from transfusion patterns, seasonal trends, and emergency history.</p>
+              <div class="accuracy-badge">R² = 0.91 Score</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-brain"></i></div>
+              <h5>Logistic Regression Scoring</h5>
+              <p>Ranks matched donors by response probability, ensuring highest-likelihood donors receive priority outreach notifications instantly.</p>
+              <div class="accuracy-badge">89.6% Response Accuracy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portals Section -->
+        <div class="text-center mt-5 mb-4">
+          <h2 class="section-title">Access Your Portal</h2>
+          <p class="section-sub text-muted">Four dedicated interfaces built for every stakeholder in the blood supply chain.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-3 col-sm-6">
+            <div class="portal-card" onclick="loginAs('donor')">
+              <div class="portal-icon"><i class="fas fa-user-nurse"></i></div>
+              <h5>Donor</h5>
+              <p>Register, manage profile, track donations, respond to emergencies</p>
+              <button class="btn-portal">Donor Login</button>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="portal-card" onclick="loginAs('hospital')">
+              <div class="portal-icon"><i class="fas fa-hospital"></i></div>
+              <h5>Hospital</h5>
+              <p>Submit blood requests, track AI-matched donor responses</p>
+              <button class="btn-portal">Hospital Login</button>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="portal-card" onclick="loginAs('blood_bank')">
+              <div class="portal-icon"><i class="fas fa-tint"></i></div>
+              <h5>Blood Bank</h5>
+              <p>Manage inventory with AI demand forecasting and alerts</p>
+              <button class="btn-portal">Bank Login</button>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="portal-card" onclick="loginAs('admin')">
+              <div class="portal-icon"><i class="fas fa-shield-alt"></i></div>
+              <h5>Administrator</h5>
+              <p>Full system overview, analytics, ML model management</p>
+              <button class="btn-portal">Admin Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ LOGIN PAGE ═══════════ -->
+  <div id="page-login" class="page">
+    <div class="auth-wrapper">
+      <div class="auth-card fade-in">
+        <div class="auth-logo">
+          <i class="fas fa-heartbeat"></i>
+          <h4>Sign In to BloodAI</h4>
+          <p style="color:var(--muted);font-size:.85rem;margin-top:4px;">Emergency blood management platform</p>
+        </div>
+        <div id="login-alert" class="alert-msg alert-error"></div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-control" id="login-email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="login-password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select class="form-select" id="login-role">
+            <option value="donor">🩸 Donor</option>
+            <option value="hospital">🏥 Hospital</option>
+            <option value="blood_bank">🏦 Blood Bank</option>
+            <option value="admin">🛡️ Administrator</option>
+          </select>
+        </div>
+        <button class="btn-auth" onclick="doLogin()"><i class="fas fa-sign-in-alt me-2"></i>Sign In</button>
+        <div class="auth-switch">Don't have an account? <a onclick="showPage('register')">Register here</a></div>
+        <div style="text-align:center;margin-top:16px;">
+          <span style="font-size:.78rem;color:var(--muted);">Demo accounts: any email, password "demo1234"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ REGISTER PAGE ═══════════ -->
+  <div id="page-register" class="page">
+    <div class="auth-wrapper">
+      <div class="auth-card fade-in">
+        <div class="auth-logo">
+          <i class="fas fa-user-plus" style="font-size:2.4rem;color:var(--red);"></i>
+          <h4>Create Account</h4>
+        </div>
+        <div id="reg-alert" class="alert-msg alert-error"></div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" class="form-control" id="reg-name" placeholder="John Smith">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="form-control" id="reg-email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="reg-password" placeholder="Min. 8 characters">
+        </div>
+        <div class="form-group">
+          <label>Account Type</label>
+          <select class="form-select" id="reg-role">
+            <option value="">-- Select Role --</option>
+            <option value="donor">🩸 Donor</option>
+            <option value="hospital">🏥 Hospital</option>
+            <option value="blood_bank">🏦 Blood Bank</option>
+            <option value="admin">🛡️ Administrator</option>
+          </select>
+        </div>
+        <button class="btn-auth" onclick="doRegister()"><i class="fas fa-user-plus me-2"></i>Create Account</button>
+        <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Sign In</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DONOR DASHBOARD ═══════════ -->
+  <div id="page-donor-dashboard" class="page">
+    <div class="content-area fade-in">
+      <div class="dash-welcome">
+        <h4>Welcome back, <span id="donor-name-display">Arjun Kumar</span>! 👋</h4>
+        <p>Blood Group: <span class="badge-blood" id="donor-bg-display">B+</span> &nbsp;|&nbsp; Next eligible: <strong id="donor-eligible-display">Ready Now</strong></p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="s-icon" style="color:var(--red);"><i class="fas fa-hand-holding-heart"></i></div>
+          <div class="s-label">Total Donations</div>
+          <div class="s-value text-danger" id="d-total-donations">7</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="s-icon" style="color:#f59e0b;"><i class="fas fa-bell"></i></div>
+          <div class="s-label">Pending Alerts</div>
+          <div class="s-value" style="color:#f59e0b;" id="d-pending">3</div>
+        </div>
+        <div class="stat-card green">
+          <div class="s-icon" style="color:#10b981;"><i class="fas fa-check-circle"></i></div>
+          <div class="s-label">Accepted</div>
+          <div class="s-value" style="color:#10b981;" id="d-accepted">2</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="s-icon" style="color:#3b82f6;"><i class="fas fa-star"></i></div>
+          <div class="s-label">Eligibility</div>
+          <div class="s-value" style="color:#3b82f6;font-size:1.2rem;">Ready ✓</div>
+        </div>
+      </div>
+
+      <!-- Emergency Notifications -->
+      <div class="data-card mb-4">
+        <div class="data-card-header">
+          <h6><i class="fas fa-bell me-2 text-danger"></i>Emergency Notifications</h6>
+          <span class="badge-blood">3 Pending</span>
+        </div>
+        <div class="data-card-body" id="donor-notifications">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- Donation History -->
+      <div class="data-card">
+        <div class="data-card-header">
+          <h6><i class="fas fa-history me-2"></i>Recent Donation History</h6>
+          <button class="btn-outline-sm" onclick="showDonationHistory()">View All</button>
+        </div>
+        <div class="data-card-body p-0">
+          <table class="tbl" id="donor-history-table">
+            <thead><tr><th>Date</th><th>Blood Group</th><th>Units Donated</th><th>Location</th></tr></thead>
+            <tbody id="donor-history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DONOR PROFILE ═══════════ -->
+  <div id="page-donor-profile" class="page">
+    <div class="content-area fade-in">
+      <div class="profile-card">
+        <div class="avatar-circle" id="donor-avatar">AK</div>
+        <h5 style="font-family:'Sora';font-weight:700;margin-bottom:4px;">Donor Profile</h5>
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px;">Update your information to stay eligible</p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Full Name</span>
+            <input type="text" class="form-control" id="p-name" value="Arjun Kumar"></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Blood Group</span>
+            <select class="form-select" id="p-bg">
+              <option>A+</option><option>A-</option><option selected>B+</option><option>B-</option>
+              <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+            </select></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Date of Birth</span>
+            <input type="date" class="form-control" id="p-dob" value="1992-04-15"></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Weight (kg)</span>
+            <input type="number" class="form-control" id="p-weight" value="72" min="45"></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Phone</span>
+            <input type="tel" class="form-control" id="p-phone" value="+91 98765 43210"></label>
+          </div>
+          <div class="col-12">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Address</span>
+            <textarea class="form-control" id="p-address" rows="2">15 Anna Salai, Coimbatore, Tamil Nadu 641001</textarea></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Latitude</span>
+            <input type="number" class="form-control" id="p-lat" value="11.016844" step="any"></label>
+          </div>
+          <div class="col-md-6">
+            <label class="form-group"><span style="font-size:.83rem;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Longitude</span>
+            <input type="number" class="form-control" id="p-lon" value="76.955833" step="any"></label>
+          </div>
+          <div class="col-12">
+            <button class="btn-outline-sm" onclick="getLocation()"><i class="fas fa-map-marker-alt me-1"></i>Use My Location</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:16px;background:var(--light-red);border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:.83rem;font-weight:600;">Eligibility Status</span>
+            <span style="font-size:.83rem;color:#10b981;font-weight:700;">✓ Ready to Donate</span>
+          </div>
+          <div class="eligibility-bar"><div class="eligibility-fill" style="width:100%;"></div></div>
+          <p style="font-size:.75rem;color:var(--muted);margin-top:6px;">112 days since last donation. Minimum 90 days required.</p>
+        </div>
+
+        <button class="btn-auth mt-4" style="max-width:200px;" onclick="saveProfile()"><i class="fas fa-save me-2"></i>Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DONATION HISTORY ═══════════ -->
+  <div id="page-donation-history" class="page">
+    <div class="content-area fade-in">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 style="font-family:'Sora';font-weight:800;">Donation History</h4>
+          <p style="color:var(--muted);font-size:.88rem;margin:0;">Complete record of your blood donations</p>
+        </div>
+        <div style="background:var(--light-red);padding:12px 20px;border-radius:12px;text-align:center;">
+          <div style="font-family:'Sora';font-weight:800;font-size:1.5rem;color:var(--red);">7</div>
+          <div style="font-size:.75rem;color:var(--muted);">Total Units</div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-body p-0">
+          <table class="tbl">
+            <thead><tr><th>#</th><th>Date</th><th>Blood Group</th><th>Units</th><th>Hospital / Camp</th><th>Status</th></tr></thead>
+            <tbody id="full-history-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="chart-wrap">
+          <canvas id="donationChart" role="img" aria-label="Bar chart showing monthly donations over the past year">Monthly donation history chart.</canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ HOSPITAL DASHBOARD ═══════════ -->
+  <div id="page-hospital-dashboard" class="page">
+    <div class="content-area fade-in">
+      <div class="dash-welcome">
+        <h4 id="hosp-name-display">Coimbatore Medical College Hospital</h4>
+        <p style="color:var(--muted);font-size:.88rem;" id="hosp-addr-display">Trichy Road, Coimbatore, Tamil Nadu</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card amber">
+          <div class="s-label">Pending</div>
+          <div class="s-value" style="color:#f59e0b;">4</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="s-label">In Progress</div>
+          <div class="s-value" style="color:#3b82f6;">2</div>
+        </div>
+        <div class="stat-card green">
+          <div class="s-label">Fulfilled</div>
+          <div class="s-value" style="color:#10b981;">18</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-label">Total Requests</div>
+          <div class="s-value text-danger">24</div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 style="font-family:'Sora';font-weight:700;margin:0;">Recent Blood Requests</h5>
+        <button class="btn-primary-sm" onclick="showNewRequest()"><i class="fas fa-plus me-1"></i>New Emergency Request</button>
+      </div>
+
+      <div class="data-card">
+        <div class="data-card-body p-0">
+          <table class="tbl">
+            <thead><tr><th>ID</th><th>Blood Group</th><th>Units</th><th>Urgency</th><th>Status</th><th>Date</th><th>Donors Notified</th><th>Action</th></tr></thead>
+            <tbody id="hospital-requests-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ NEW REQUEST ═══════════ -->
+  <div id="page-new-request" class="page">
+    <div class="content-area fade-in">
+      <div class="req-form-card">
+        <div class="req-form-title"><i class="fas fa-tint me-2"></i>Submit Emergency Blood Request</div>
+
+        <!-- Step wizard -->
+        <div class="step-wizard">
+          <div class="step-item"><div class="step-num active" id="sw1">1</div><div class="step-label active">Blood Details</div></div>
+          <div class="step-divider"></div>
+          <div class="step-item"><div class="step-num" id="sw2">2</div><div class="step-label">Urgency</div></div>
+          <div class="step-divider"></div>
+          <div class="step-item"><div class="step-num" id="sw3">3</div><div class="step-label">AI Match</div></div>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="req-step1">
+          <div style="margin-bottom:20px;">
+            <label style="font-size:.83rem;font-weight:600;display:block;margin-bottom:10px;">Blood Group Required</label>
+            <div class="blood-group-grid">
+              <input type="radio" name="req-bg" id="bg-Ap" value="A+" class="bg-option"><label for="bg-Ap">A+</label>
+              <input type="radio" name="req-bg" id="bg-An" value="A-" class="bg-option"><label for="bg-An">A-</label>
+              <input type="radio" name="req-bg" id="bg-Bp" value="B+" class="bg-option" checked><label for="bg-Bp">B+</label>
+              <input type="radio" name="req-bg" id="bg-Bn" value="B-" class="bg-option"><label for="bg-Bn">B-</label>
+              <input type="radio" name="req-bg" id="bg-Op" value="O+" class="bg-option"><label for="bg-Op">O+</label>
+              <input type="radio" name="req-bg" id="bg-On" value="O-" class="bg-option"><label for="bg-On">O-</label>
+              <input type="radio" name="req-bg" id="bg-ABp" value="AB+" class="bg-option"><label for="bg-ABp">AB+</label>
+              <input type="radio" name="req-bg" id="bg-ABn" value="AB-" class="bg-option"><label for="bg-ABn">AB-</label>
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="font-size:.83rem;font-weight:600;display:block;margin-bottom:10px;">Units Required: <span id="units-val" style="color:var(--red);">1</span></label>
+            <input type="range" class="range-slider" min="1" max="20" value="1" id="units-slider" oninput="document.getElementById('units-val').textContent=this.value">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-top:4px;"><span>1 unit</span><span>20 units</span></div>
+          </div>
+          <button class="btn-auth" onclick="reqStep2()">Continue <i class="fas fa-arrow-right ms-2"></i></button>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="req-step2" style="display:none;">
+          <div style="margin-bottom:20px;">
+            <label style="font-size:.83rem;font-weight:600;display:block;margin-bottom:10px;">Urgency Level</label>
+            <div class="urgency-grid">
+              <input type="radio" name="req-urgency" id="urg-critical" value="critical" class="urgency-option critical">
+              <label for="urg-critical">🚨 Critical</label>
+              <input type="radio" name="req-urgency" id="urg-urgent" value="urgent" class="urgency-option urgent" checked>
+              <label for="urg-urgent">⚠️ Urgent</label>
+              <input type="radio" name="req-urgency" id="urg-normal" value="normal" class="urgency-option normal">
+              <label for="urg-normal">✅ Normal</label>
+            </div>
+          </div>
+          <div class="form-group mb-4">
+            <label style="font-size:.83rem;font-weight:600;display:block;margin-bottom:6px;">Patient Details <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+            <textarea class="form-control" id="req-patient" rows="2" placeholder="e.g. Ward 5B, trauma case, post-surgery"></textarea>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <i class="fas fa-robot" style="color:#10b981;margin-top:2px;"></i>
+              <div>
+                <div style="font-weight:700;font-size:.88rem;margin-bottom:4px;">AI Engine Ready</div>
+                <div style="font-size:.82rem;color:#374151;">KNN will find top 5 compatible donors → LR will rank by response probability → Notifications dispatched instantly</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn-outline-sm" onclick="reqStep1()"><i class="fas fa-arrow-left me-1"></i>Back</button>
+            <button class="btn-auth" style="flex:1;" onclick="reqStep3()"><i class="fas fa-paper-plane me-2"></i>Submit & Run AI Matching</button>
+          </div>
+        </div>
+
+        <!-- Step 3 — AI results -->
+        <div id="req-step3" style="display:none;">
+          <div style="text-align:center;padding:20px 0;" id="ai-loading">
+            <div style="font-size:2rem;color:var(--red);margin-bottom:12px;"><i class="fas fa-brain"></i></div>
+            <div style="font-family:'Sora';font-weight:700;font-size:1rem;margin-bottom:6px;">Running AI Matching Engine...</div>
+            <div style="font-size:.82rem;color:var(--muted);">KNN • Random Forest • Logistic Regression</div>
+            <div style="margin-top:20px;background:#e5e7eb;border-radius:4px;height:6px;overflow:hidden;">
+              <div id="ai-prog-bar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--red),#f59e0b);border-radius:4px;transition:width .3s;"></div>
+            </div>
+          </div>
+          <div id="ai-results" style="display:none;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <div style="background:#d1fae5;color:#065f46;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-check" style="font-size:.75rem;"></i></div>
+              <div style="font-weight:700;font-size:.95rem;">Request Submitted · AI Matching Complete</div>
+            </div>
+            <div id="ai-donor-matches"></div>
+            <div style="background:var(--light-red);border-radius:10px;padding:14px;margin-top:14px;font-size:.83rem;color:var(--muted);">
+              <i class="fas fa-info-circle me-2" style="color:var(--red);"></i>
+              5 donors notified via SMS & email. Notifications ranked by response probability score.
+            </div>
+            <button class="btn-outline-sm mt-3" onclick="showHospitalDashboard()">← Back to Dashboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ADMIN DASHBOARD ═══════════ -->
+  <div id="page-admin-dashboard" class="page">
+    <div class="content-area fade-in">
+      <div class="dash-welcome">
+        <h4>System Overview</h4>
+        <p style="color:var(--muted);font-size:.88rem;">BloodAI — AI-Enhanced Blood Management Platform</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="s-label">Total Donors</div><div class="s-value text-danger">2,847</div></div>
+        <div class="stat-card blue"><div class="s-label">Hospitals</div><div class="s-value" style="color:#3b82f6;">142</div></div>
+        <div class="stat-card amber"><div class="s-label">Active Requests</div><div class="s-value" style="color:#f59e0b;">18</div></div>
+        <div class="stat-card green"><div class="s-label">Fulfilled</div><div class="s-value" style="color:#10b981;">1,284</div></div>
+        <div class="stat-card"><div class="s-label">Donations</div><div class="s-value text-danger">5,632</div></div>
+        <div class="stat-card blue"><div class="s-label">Blood Banks</div><div class="s-value" style="color:#3b82f6;">28</div></div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-8">
+          <div class="data-card">
+            <div class="data-card-header"><h6><i class="fas fa-chart-bar me-2 text-danger"></i>Monthly Blood Requests (2024–25)</h6></div>
+            <div class="data-card-body">
+              <div class="chart-wrap"><canvas id="adminRequestChart" role="img" aria-label="Monthly blood requests bar chart">Monthly blood request volume chart.</canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="data-card mb-3">
+            <div class="data-card-header"><h6><i class="fas fa-tint me-2 text-danger"></i>Blood Group Distribution</h6></div>
+            <div class="data-card-body">
+              <div class="chart-wrap-sm"><canvas id="bgDistChart" role="img" aria-label="Blood group distribution pie chart">Blood group distribution chart.</canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mt-1">
+        <div class="col-md-6">
+          <div class="data-card">
+            <div class="data-card-header"><h6><i class="fas fa-tint me-2 text-danger"></i>Recent Blood Requests</h6></div>
+            <div class="data-card-body p-0">
+              <table class="tbl">
+                <thead><tr><th>ID</th><th>Hospital</th><th>BG</th><th>Urgency</th><th>Status</th></tr></thead>
+                <tbody id="admin-requests-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="data-card">
+            <div class="data-card-header">
+              <h6><i class="fas fa-brain me-2 text-danger"></i>ML Model Status</h6>
+              <button class="btn-primary-sm" onclick="retrainModels()"><i class="fas fa-sync me-1"></i>Retrain All</button>
+            </div>
+            <div class="data-card-body" id="ml-status-panel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ML MODELS PAGE ═══════════ -->
+  <div id="page-ml-models" class="page">
+    <div class="content-area fade-in">
+      <h4 style="font-family:'Sora';font-weight:800;margin-bottom:4px;">ML Model Management</h4>
+      <p style="color:var(--muted);font-size:.88rem;margin-bottom:24px;">Monitor, retrain, and evaluate all three AI engines</p>
+
+      <div class="row g-4" id="ml-models-grid"></div>
+
+      <div class="data-card mt-4">
+        <div class="data-card-header"><h6><i class="fas fa-chart-line me-2 text-danger"></i>Model Performance Over Time</h6></div>
+        <div class="data-card-body">
+          <div class="chart-wrap"><canvas id="mlPerfChart" role="img" aria-label="ML model performance line chart over time">Model performance trend chart.</canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ REPORTS PAGE ═══════════ -->
+  <div id="page-reports" class="page">
+    <div class="content-area fade-in">
+      <h4 style="font-family:'Sora';font-weight:800;margin-bottom:24px;">Analytics & Reports</h4>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="data-card">
+            <div class="data-card-header"><h6>Blood Demand Forecast (RF Model)</h6></div>
+            <div class="data-card-body">
+              <div class="chart-wrap"><canvas id="demandForecastChart" role="img" aria-label="Blood demand forecast for next 30 days">Demand forecast chart.</canvas></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="data-card">
+            <div class="data-card-header"><h6>Donor Response Rate by Blood Group</h6></div>
+            <div class="data-card-body">
+              <div class="chart-wrap"><canvas id="responseRateChart" role="img" aria-label="Donor response rate by blood group">Response rate chart.</canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main-content -->
+
+<!-- TOAST -->
+<div id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg">Success</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let currentUser = null;
+let charts = {};
+
+const DEMO = {
+  donors: [
+    {id:1,name:'Arjun Kumar',bg:'B+',dob:'1992-04-15',weight:72,phone:'+91 98765 43210',address:'15 Anna Salai, Coimbatore',lat:11.016844,lon:76.955833,donations:7,eligible:true,lastDonation:'2025-02-14'},
+    {id:2,name:'Priya Sharma',bg:'O+',dob:'1995-08-22',weight:58,phone:'+91 87654 32109',address:'42 Race Course Road, Coimbatore',lat:11.003793,lon:76.962017,donations:4,eligible:true,lastDonation:'2025-01-10'},
+    {id:3,name:'Ravi Mohan',bg:'A+',dob:'1988-12-01',weight:80,phone:'+91 76543 21098',address:'7 Peelamedu, Coimbatore',lat:11.026553,lon:76.994538,donations:12,eligible:false,lastDonation:'2025-04-20'},
+  ],
+  hospitals: [
+    {id:1,name:'Coimbatore Medical College Hospital',address:'Trichy Road, Coimbatore, Tamil Nadu'},
+    {id:2,name:'PSG Hospitals',address:'Peelamedu, Coimbatore, Tamil Nadu'},
+  ],
+  donationHistory: [
+    {date:'2025-02-14',bg:'B+',units:1,location:'CMC Hospital, Coimbatore'},
+    {date:'2024-10-20',bg:'B+',units:1,location:'Blood Donation Camp, CBE'},
+    {date:'2024-07-05',bg:'B+',units:1,location:'KMCH, Coimbatore'},
+    {date:'2024-03-18',bg:'B+',units:1,location:'PSG Hospitals'},
+    {date:'2023-12-01',bg:'B+',units:1,location:'CMC Hospital, Coimbatore'},
+    {date:'2023-08-14',bg:'B+',units:1,location:'District Blood Bank'},
+    {date:'2023-04-10',bg:'B+',units:2,location:'Govt General Hospital'},
+  ],
+  notifications: [
+    {id:1,reqId:'#1042',bg:'B+',hospital:'CMC Hospital',urgency:'critical',time:'10 min ago',response:'pending'},
+    {id:2,reqId:'#1038',bg:'B+',hospital:'PSG Hospitals',urgency:'urgent',time:'2 hrs ago',response:'pending'},
+    {id:3,reqId:'#1031',bg:'O+',hospital:'KMCH',urgency:'normal',time:'5 hrs ago',response:'pending'},
+    {id:4,reqId:'#1020',bg:'B+',hospital:'CMC Hospital',urgency:'urgent',time:'1 day ago',response:'accepted'},
+  ],
+  hospitalRequests: [
+    {id:'#1042',bg:'B+',units:2,urgency:'critical',status:'pending',date:'2025-05-06',donors:5},
+    {id:'#1038',bg:'O-',units:1,urgency:'urgent',status:'in_progress',date:'2025-05-05',donors:5},
+    {id:'#1031',bg:'A+',units:3,urgency:'normal',status:'fulfilled',date:'2025-05-04',donors:3},
+    {id:'#1020',bg:'AB+',units:1,urgency:'urgent',status:'fulfilled',date:'2025-05-02',donors:5},
+    {id:'#1015',bg:'B-',units:2,urgency:'critical',status:'fulfilled',date:'2025-04-30',donors:5},
+  ],
+  adminRequests: [
+    {id:'#1042',hospital:'CMC Hospital',bg:'B+',urgency:'critical',status:'pending'},
+    {id:'#1038',hospital:'PSG Hospitals',bg:'O-',urgency:'urgent',status:'in_progress'},
+    {id:'#1031',hospital:'KMCH',bg:'A+',urgency:'normal',status:'fulfilled'},
+    {id:'#1020',hospital:'Ganga Hospital',bg:'AB+',urgency:'urgent',status:'fulfilled'},
+    {id:'#1015',hospital:'CMC Hospital',bg:'B-',urgency:'critical',status:'fulfilled'},
+  ],
+  knnMatches: [
+    {rank:1,name:'Priya Sharma',bg:'B+',distance:'1.2 km',lastDon:'5 months ago',score:97},
+    {rank:2,name:'Karthik R.',bg:'B+',distance:'2.8 km',lastDon:'4 months ago',score:91},
+    {rank:3,name:'Deepa M.',bg:'O+',distance:'3.4 km',lastDon:'6 months ago',score:84},
+    {rank:4,name:'Venkat S.',bg:'B+',distance:'4.1 km',lastDon:'7 months ago',score:78},
+    {rank:5,name:'Anjali T.',bg:'B+',distance:'5.9 km',lastDon:'3 months ago',score:71},
+  ]
+};
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+}
+
+function goHome() {
+  if(currentUser) { showDashboard(); return; }
+  showPage('home');
+  document.getElementById('sidebar').classList.remove('visible');
+  document.getElementById('main-content').classList.remove('with-sidebar');
+}
+
+function showDashboard() {
+  if(!currentUser) return;
+  if(currentUser.role === 'donor') showDonorDash();
+  else if(currentUser.role === 'hospital') showHospitalDashboard();
+  else if(currentUser.role === 'admin') showAdminDashboard();
+  else showDonorDash();
+}
+
+// ════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const role = document.getElementById('login-role').value;
+  const alert = document.getElementById('login-alert');
+
+  if(!email || !pass) { showAlert(alert, 'Please fill in all fields.'); return; }
+  if(pass.length < 8) { showAlert(alert, 'Password must be at least 8 characters.'); return; }
+
+  alert.classList.remove('show');
+  const name = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  currentUser = {name, email, role};
+  setupSession();
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const role = document.getElementById('reg-role').value;
+  const alert = document.getElementById('reg-alert');
+
+  if(!name||!email||!pass||!role) { showAlert(alert,'Please fill in all fields.'); return; }
+  if(pass.length < 8) { showAlert(alert,'Password must be at least 8 characters.'); return; }
+  if(!email.includes('@')) { showAlert(alert,'Please enter a valid email.'); return; }
+
+  alert.classList.remove('show');
+  currentUser = {name, email, role};
+  setupSession();
+  showToast('Account created successfully! Welcome, ' + name + '!');
+}
+
+function loginAs(role) {
+  currentUser = {name: role === 'donor' ? 'Arjun Kumar' : role === 'hospital' ? 'CMC Hospital' : role === 'admin' ? 'Admin User' : 'Blood Bank User', email: role+'@demo.com', role};
+  setupSession();
+}
+
+function setupSession() {
+  document.getElementById('navbar-auth-area').style.display = 'none';
+  document.getElementById('navbar-user-area').style.display = 'flex';
+  document.getElementById('nav-username').textContent = currentUser.name;
+  document.getElementById('nav-role-badge').textContent = currentUser.role.replace('_',' ');
+
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.add('visible');
+  document.getElementById('main-content').classList.add('with-sidebar');
+
+  document.querySelectorAll('[id^="sidebar-"]').forEach(el => el.style.display = 'none');
+  const roleMap = {donor:'sidebar-donor', hospital:'sidebar-hospital', blood_bank:'sidebar-hospital', admin:'sidebar-admin'};
+  const el = document.getElementById(roleMap[currentUser.role] || 'sidebar-donor');
+  if(el) el.style.display = 'block';
+
+  showDashboard();
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('navbar-auth-area').style.display = 'flex';
+  document.getElementById('navbar-user-area').style.display = 'none';
+  document.getElementById('sidebar').classList.remove('visible');
+  document.getElementById('main-content').classList.remove('with-sidebar');
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  charts = {};
+  showPage('home');
+}
+
+// ════════════════════════════════════════════
+// DONOR PAGES
+// ════════════════════════════════════════════
+function showDonorDash() {
+  document.getElementById('donor-name-display').textContent = currentUser.name || 'Arjun Kumar';
+  renderDonorNotifications();
+  renderDonorHistoryShort();
+  document.getElementById('pending-badge').style.display = 'inline';
+  showPage('donor-dashboard');
+}
+
+function renderDonorNotifications() {
+  const container = document.getElementById('donor-notifications');
+  container.innerHTML = DEMO.notifications.map(n => `
+    <div class="notif-item ${n.urgency}" id="notif-${n.id}">
+      <div class="notif-header">
+        <div class="notif-title"><i class="fas fa-tint me-2" style="color:var(--red);"></i>Blood Request ${n.reqId}</div>
+        <div class="notif-time"><i class="fas fa-clock me-1"></i>${n.time}</div>
+      </div>
+      <div class="notif-meta">
+        <span>Hospital: <strong>${n.hospital}</strong></span>
+        <span class="badge-blood">${n.bg}</span>
+        <span class="badge-status badge-${n.urgency}">${n.urgency.charAt(0).toUpperCase()+n.urgency.slice(1)}</span>
+      </div>
+      ${n.response === 'pending' ? `
+      <div class="notif-actions">
+        <button class="btn-success-sm" onclick="respondNotif(${n.id},'accepted')"><i class="fas fa-check me-1"></i>Accept</button>
+        <button class="btn-danger-sm" onclick="respondNotif(${n.id},'declined')">Decline</button>
+      </div>` : `<span class="badge-status badge-${n.response}" style="display:inline-block;">${n.response.charAt(0).toUpperCase()+n.response.slice(1)}</span>`}
+    </div>
+  `).join('');
+}
+
+function respondNotif(id, resp) {
+  const notif = DEMO.notifications.find(n => n.id === id);
+  if(notif) {
+    notif.response = resp;
+    renderDonorNotifications();
+    showToast(resp === 'accepted' ? '✓ Request accepted! Hospital notified.' : 'Response recorded.');
+    if(resp === 'accepted') {
+      DEMO.donationHistory.unshift({date: new Date().toISOString().split('T')[0], bg: notif.bg, units: 1, location: notif.hospital});
+    }
+  }
+}
+
+function renderDonorHistoryShort() {
+  const tbody = document.getElementById('donor-history-body');
+  tbody.innerHTML = DEMO.donationHistory.slice(0,3).map(h => `
+    <tr>
+      <td>${formatDate(h.date)}</td>
+      <td><span class="badge-blood">${h.bg}</span></td>
+      <td>${h.units} unit(s)</td>
+      <td>${h.location}</td>
+    </tr>
+  `).join('');
+}
+
+function showDonorNotifications() { renderDonorNotifications(); showPage('donor-dashboard'); }
+function showDonorProfile() { showPage('donor-profile'); }
+
+function showDonationHistory() {
+  const tbody = document.getElementById('full-history-body');
+  tbody.innerHTML = DEMO.donationHistory.map((h,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${formatDate(h.date)}</td>
+      <td><span class="badge-blood">${h.bg}</span></td>
+      <td>${h.units}</td>
+      <td>${h.location}</td>
+      <td><span class="badge-status badge-fulfilled">Completed</span></td>
+    </tr>
+  `).join('');
+  showPage('donation-history');
+  setTimeout(() => renderDonationChart(), 100);
+}
+
+function renderDonationChart() {
+  if(charts.donationChart) { charts.donationChart.destroy(); }
+  const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+  const data = [1,0,0,1,1,0,1,0,0,1,1,0];
+  charts.donationChart = new Chart(document.getElementById('donationChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Donations',
+        data,
+        backgroundColor: data.map(v => v > 0 ? '#c0392b' : '#fdecea'),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 2, ticks: { stepSize: 1 }, grid: { color: '#f3f1ed' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function saveProfile() {
+  const name = document.getElementById('p-name').value;
+  currentUser.name = name;
+  document.getElementById('donor-name-display').textContent = name;
+  document.getElementById('nav-username').textContent = name;
+  document.getElementById('donor-avatar').textContent = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  showToast('Profile saved successfully!');
+}
+
+function getLocation() {
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(p => {
+      document.getElementById('p-lat').value = p.coords.latitude.toFixed(6);
+      document.getElementById('p-lon').value = p.coords.longitude.toFixed(6);
+      showToast('Location updated!');
+    }, () => showToast('Location access denied.'));
+  }
+}
+
+// ════════════════════════════════════════════
+// HOSPITAL PAGES
+// ════════════════════════════════════════════
+function showHospitalDashboard() {
+  renderHospitalRequests();
+  showPage('hospital-dashboard');
+}
+
+function renderHospitalRequests() {
+  const tbody = document.getElementById('hospital-requests-body');
+  tbody.innerHTML = DEMO.hospitalRequests.map(r => `
+    <tr>
+      <td style="font-family:'Sora';font-weight:700;">${r.id}</td>
+      <td><span class="badge-blood">${r.bg}</span></td>
+      <td>${r.units}</td>
+      <td><span class="badge-status badge-${r.urgency}">${r.urgency}</span></td>
+      <td><span class="badge-status badge-${r.status.replace('_','')}">${r.status.replace('_',' ')}</span></td>
+      <td>${formatDate(r.date)}</td>
+      <td>${r.donors} donors</td>
+      <td><button class="btn-outline-sm">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function showAllRequests() { showHospitalDashboard(); }
+function showHospitalProfile() { showPage('donor-profile'); }
+
+function showNewRequest() {
+  reqStep1(true);
+  showPage('new-request');
+}
+
+function reqStep1(init) {
+  if(!init) {}
+  document.getElementById('req-step1').style.display = 'block';
+  document.getElementById('req-step2').style.display = 'none';
+  document.getElementById('req-step3').style.display = 'none';
+  document.getElementById('sw1').className = 'step-num active';
+  document.getElementById('sw2').className = 'step-num';
+  document.getElementById('sw3').className = 'step-num';
+}
+
+function reqStep2() {
+  document.getElementById('req-step1').style.display = 'none';
+  document.getElementById('req-step2').style.display = 'block';
+  document.getElementById('req-step3').style.display = 'none';
+  document.getElementById('sw1').className = 'step-num done';
+  document.getElementById('sw2').className = 'step-num active';
+}
+
+function reqStep3() {
+  document.getElementById('req-step1').style.display = 'none';
+  document.getElementById('req-step2').style.display = 'none';
+  document.getElementById('req-step3').style.display = 'block';
+  document.getElementById('sw1').className = 'step-num done';
+  document.getElementById('sw2').className = 'step-num done';
+  document.getElementById('sw3').className = 'step-num active';
+  document.getElementById('ai-loading').style.display = 'block';
+  document.getElementById('ai-results').style.display = 'none';
+
+  let prog = 0;
+  const bar = document.getElementById('ai-prog-bar');
+  const interval = setInterval(() => {
+    prog += Math.random() * 15;
+    if(prog >= 100) { prog = 100; clearInterval(interval); showAIResults(); }
+    bar.style.width = Math.min(prog, 100) + '%';
+  }, 180);
+}
+
+function showAIResults() {
+  document.getElementById('ai-loading').style.display = 'none';
+  document.getElementById('ai-results').style.display = 'block';
+  document.getElementById('sw3').className = 'step-num done';
+  const bg = document.querySelector('input[name="req-bg"]:checked')?.value || 'B+';
+  const container = document.getElementById('ai-donor-matches');
+  container.innerHTML = `
+    <div style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">
+      <i class="fas fa-brain me-1" style="color:var(--red);"></i>KNN + Logistic Regression Rankings for ${bg}
+    </div>
+    ${DEMO.knnMatches.map(m => `
+      <div class="donor-match">
+        <div class="rank">#${m.rank}</div>
+        <div class="info">
+          <strong>${m.name}</strong>
+          <span><span class="badge-blood" style="font-size:.68rem;padding:2px 7px;">${m.bg}</span> · ${m.distance} · Last donated ${m.lastDon}</span>
+          <div class="match-bar"><div class="match-bar-fill" style="width:${m.score}%;"></div></div>
+        </div>
+        <div class="match-score">
+          <span class="pct">${m.score}%</span>
+          <span class="lbl">Response Score</span>
+        </div>
+      </div>
+    `).join('')}
+  `;
+  DEMO.hospitalRequests.unshift({id:`#${1050+Math.floor(Math.random()*10)}`, bg, units: document.getElementById('units-val').textContent, urgency: document.querySelector('input[name="req-urgency"]:checked')?.value||'urgent', status:'pending', date:new Date().toISOString().split('T')[0], donors:5});
+  showToast('🚨 5 donors notified! AI matching complete.');
+}
+
+// ════════════════════════════════════════════
+// ADMIN PAGES
+// ════════════════════════════════════════════
+function showAdminDashboard() {
+  renderAdminRequests();
+  renderMLStatus();
+  showPage('admin-dashboard');
+  setTimeout(() => { renderAdminRequestChart(); renderBGDistChart(); }, 100);
+}
+
+function renderAdminRequests() {
+  const tbody = document.getElementById('admin-requests-body');
+  tbody.innerHTML = DEMO.adminRequests.map(r => `
+    <tr>
+      <td style="font-family:'Sora';font-weight:700;">${r.id}</td>
+      <td style="font-size:.83rem;">${r.hospital.slice(0,20)}</td>
+      <td><span class="badge-blood">${r.bg}</span></td>
+      <td><span class="badge-status badge-${r.urgency}">${r.urgency}</span></td>
+      <td><span class="badge-status badge-${r.status.replace('_','')}">${r.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderMLStatus() {
+  const models = [
+    {name:'KNN Donor Matcher',date:'2025-05-01',acc:'93.2%',metric:'Accuracy'},
+    {name:'Random Forest Forecaster',date:'2025-05-01',r2:'0.91',metric:'R² Score'},
+    {name:'Logistic Regression Scorer',date:'2025-05-01',acc:'89.6%',metric:'Accuracy'},
+  ];
+  document.getElementById('ml-status-panel').innerHTML = models.map(m => `
+    <div style="background:#f9f8f6;border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:.88rem;margin-bottom:4px;">${m.name}</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px;">Trained: ${m.date}</div>
+      <span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:.76rem;font-weight:700;">${m.metric}: ${m.acc||m.r2}</span>
+    </div>
+  `).join('');
+}
+
+function showUsers() { showAdminDashboard(); showToast('Users module — connect to Flask backend.'); }
+
+function showMLModels() {
+  const models = [
+    {name:'KNN Donor Recommendation',algo:'K-Nearest Neighbors',acc:'93.2',prec:'91.8',rec:'94.7',f1:'93.2',r2:null,trained:'2025-05-01',desc:'Geospatial donor matching using Haversine distance + blood compatibility'},
+    {name:'Random Forest Forecaster',algo:'Random Forest Regressor',acc:null,prec:null,rec:null,f1:null,r2:'0.91',rmse:'4.2',trained:'2025-05-01',desc:'7–30 day blood demand prediction by hospital and district level'},
+    {name:'Logistic Regression Scorer',algo:'Logistic Regression',acc:'89.6',prec:'88.3',rec:'91.2',f1:'89.7',r2:null,trained:'2025-05-01',desc:'Donor response probability scoring for prioritized notification dispatch'},
+  ];
+  document.getElementById('ml-models-grid').innerHTML = models.map(m => `
+    <div class="col-md-4">
+      <div class="ml-card">
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+          <div style="background:var(--light-red);color:var(--red);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;"><i class="fas fa-brain"></i></div>
+          <div><div style="font-family:'Sora';font-weight:700;font-size:.92rem;">${m.name}</div><div style="font-size:.76rem;color:var(--muted);">${m.algo}</div></div>
+        </div>
+        <p style="font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:12px;">${m.desc}</p>
+        <div class="ml-metric">
+          ${m.acc ? `<div class="ml-metric-item"><div class="val">${m.acc}%</div><div class="lbl">Accuracy</div></div>` : ''}
+          ${m.prec ? `<div class="ml-metric-item"><div class="val">${m.prec}%</div><div class="lbl">Precision</div></div>` : ''}
+          ${m.rec ? `<div class="ml-metric-item"><div class="val">${m.rec}%</div><div class="lbl">Recall</div></div>` : ''}
+          ${m.f1 ? `<div class="ml-metric-item"><div class="val">${m.f1}%</div><div class="lbl">F1 Score</div></div>` : ''}
+          ${m.r2 ? `<div class="ml-metric-item"><div class="val">${m.r2}</div><div class="lbl">R² Score</div></div>` : ''}
+          ${m.rmse ? `<div class="ml-metric-item"><div class="val">${m.rmse}</div><div class="lbl">RMSE</div></div>` : ''}
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.75rem;color:var(--muted);">Last trained: ${m.trained}</span>
+          <button class="btn-primary-sm" style="font-size:.76rem;padding:5px 12px;" onclick="showToast('Retraining ${m.name}...')"><i class="fas fa-sync me-1"></i>Retrain</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  showPage('ml-models');
+  setTimeout(() => renderMLPerfChart(), 100);
+}
+
+function showReports() {
+  showPage('reports');
+  setTimeout(() => { renderDemandForecastChart(); renderResponseRateChart(); }, 100);
+}
+
+function retrainModels() {
+  showToast('🤖 Retraining all ML models... This may take a moment.');
+  setTimeout(() => showToast('✓ All models retrained successfully!'), 3000);
+}
+
+// ════════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════════
+function renderAdminRequestChart() {
+  if(charts.adminReq) charts.adminReq.destroy();
+  const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+  const data = [42,38,55,61,48,52,70,65,58,74,81,69,76,83];
+  charts.adminReq = new Chart(document.getElementById('adminRequestChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {label:'Total Requests', data, backgroundColor:'#c0392b', borderRadius:5},
+        {label:'Fulfilled', data: data.map(v=>Math.floor(v*.85)), backgroundColor:'#10b981', borderRadius:5},
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f3f1ed' } },
+        x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0 } }
+      }
+    }
+  });
+}
+
+function renderBGDistChart() {
+  if(charts.bgDist) charts.bgDist.destroy();
+  charts.bgDist = new Chart(document.getElementById('bgDistChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['O+','A+','B+','AB+','O-','A-','B-','AB-'],
+      datasets: [{
+        data: [38,28,22,8,2,1,0.8,0.2],
+        backgroundColor: ['#c0392b','#e74c3c','#e57373','#f48fb1','#96281b','#7b1818','#d32f2f','#ef9a9a'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10 } } },
+      cutout: '60%',
+    }
+  });
+}
+
+function renderMLPerfChart() {
+  if(charts.mlPerf) charts.mlPerf.destroy();
+  const months = ['Jan','Feb','Mar','Apr','May'];
+  charts.mlPerf = new Chart(document.getElementById('mlPerfChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {label:'KNN Accuracy', data:[88.4,90.1,91.7,92.5,93.2], borderColor:'#c0392b', tension:.4, borderWidth:2.5, pointRadius:4, fill:false},
+        {label:'LR Accuracy', data:[85.2,86.8,87.9,88.8,89.6], borderColor:'#3b82f6', tension:.4, borderWidth:2.5, pointRadius:4, fill:false, borderDash:[5,5]},
+        {label:'RF R²×100', data:[86,87.5,89,90.2,91], borderColor:'#10b981', tension:.4, borderWidth:2.5, pointRadius:4, fill:false, borderDash:[2,4]},
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 12 }, boxWidth: 12 } } },
+      scales: {
+        y: { min: 82, max: 97, grid: { color: '#f3f1ed' }, ticks: { callback: v => v+'%' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderDemandForecastChart() {
+  if(charts.forecast) charts.forecast.destroy();
+  const days = Array.from({length:30},(_,i)=>`May ${i+6}`);
+  const actual = [18,22,19,25,30,21,18,24,28,26,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
+  const forecast = [null,null,null,null,null,null,null,null,null,26,28,31,27,24,30,33,29,26,32,35,31,28,34,37,33,30,36,39,35,32];
+  charts.forecast = new Chart(document.getElementById('demandForecastChart'), {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [
+        {label:'Actual', data:actual, borderColor:'#c0392b', borderWidth:2.5, tension:.4, pointRadius:3, spanGaps:false},
+        {label:'RF Forecast', data:forecast, borderColor:'#3b82f6', borderDash:[6,3], borderWidth:2, tension:.4, pointRadius:2, spanGaps:false},
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } },
+      scales: {
+        y: { beginAtZero: false, grid: { color: '#f3f1ed' } },
+        x: { grid: { display: false }, ticks: { maxRotation: 45, autoSkip: true, maxTicksLimit: 10 } }
+      }
+    }
+  });
+}
+
+function renderResponseRateChart() {
+  if(charts.responseRate) charts.responseRate.destroy();
+  charts.responseRate = new Chart(document.getElementById('responseRateChart'), {
+    type: 'bar',
+    data: {
+      labels: ['A+','A-','B+','B-','O+','O-','AB+','AB-'],
+      datasets: [{label:'Response Rate (%)', data:[87,72,91,68,94,79,85,71], backgroundColor:'#c0392b', borderRadius:5}]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 100, ticks: { callback: v=>v+'%' }, grid: { color: '#f3f1ed' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════
+function showAlert(el, msg) {
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+// Live counter animation on home
+function animateStat(id, target) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  let current = 0;
+  const step = target / 40;
+  const interval = setInterval(() => {
+    current += step;
+    if(current >= target) { current = target; clearInterval(interval); }
+    el.textContent = Math.floor(current).toLocaleString();
+  }, 40);
+}
+
+// Animate live stats on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    animateStat('live-donors', 2847);
+    animateStat('live-hospitals', 142);
+    animateStat('live-requests', 18);
+  }, 500);
+});
+</script>
+</body>
+</html>
